@@ -1,0 +1,2 @@
+-define(ANY, '$any').
+-define(IPV4_STRING_SPLIT_CHAR, ".").

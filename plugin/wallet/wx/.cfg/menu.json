@@ -1,0 +1,16 @@
+%%服务器启动后，调用以下url，获取微信token( 凭证随机码)
+%% http://test.yinengyun.cn/wx/cmd/token
+%%获取微信token后，采用微信调试工具添加菜单
+%% https://mp.weixin.qq.com/debug/cgi-bin/apiinfo?t=index&type=%E8%87%AA%E5%AE%9A%E4%B9%89%E8%8F%9C%E5%8D%95&form=%E8%87%AA%E5%AE%9A%E4%B9%89%E8%8F%9C%E5%8D%95%E5%88%9B%E5%BB%BA%E6%8E%A5%E5%8F%A3%20/menu/create
+
+%%添加菜单
+{"button":[
+{
+"type": "view",
+"name": "麻将",
+"url": "http://test.yinengyun.cn/majiang/app/boot/index.html"
+}
+]
+}
+
+
