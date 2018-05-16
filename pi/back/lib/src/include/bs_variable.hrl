@@ -1,0 +1,4 @@
+-define(BS_MAX_STORAGE_SIZE, 16#100000000000).
+-define(DATA_ASYN_WAIT, data_wait).
+-define(DATA_INTERRUPT_STATE, data_interrupt).
+-define(EMPTY, undefined).

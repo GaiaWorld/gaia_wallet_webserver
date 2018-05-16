@@ -1,0 +1,14 @@
+/db
+
+/log
+/plugin/htdocs/.res/
+/plugin/wallet/htdocs/.res/
+/plugin/wallet/.ebin
+/plugin/pt/.ebin
+/plugin/common/.ebin
+/plugin/.settings
+/plugin/.project
+/pi/back/lib/ebin
+/pi/back/boot/sasl.log
+/pi/back/boot/erl_crash.dump
+/pi/back/boot/error.log

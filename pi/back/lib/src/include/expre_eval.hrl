@@ -1,0 +1,18 @@
+-define(INNER_ADD, 'add').
+-define(INNER_SUB, 'sub').
+-define(INNER_MUL, 'mul').
+-define(INNER_DIV, 'divi').
+-define(INNER_EDIV, 'ediv').
+-define(INNER_REM, 'mod').
+-define(INNER_POW, 'pow').
+-define(INNER_LESS_THAN, 'less_than').
+-define(INNER_LESS_EQUAL_THAN, 'less_equal_than').
+-define(INNER_EQUAL, 'equal').
+-define(INNER_GREATER_THAN, 'greater_than').
+-define(INNER_GREATER_EQUAL_THAN, 'greater_equal_than').
+-define(INNER_NO_EQUAL, 'no_equal').
+-define(INNER_AND, 'booland').
+-define(INNER_OR, 'boolor').
+-define(INNER_NOT, 'boolnot').
+-define(INNER_XOR, 'boolxor').
+

@@ -1,0 +1,6 @@
+-define(SLAVE, slave).
+-define(LOG_LAYER, log).
+-define(LOG_SERVER, zm_logger).
+-define(PROXY_RETRIEVAL, proxy_retrieval).
+-define(INDEX_NOT_EXIST, index_not_exist).
+-define(NON_VALID_NODE, non_valid_node).

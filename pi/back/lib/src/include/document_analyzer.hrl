@@ -1,0 +1,7 @@
+-define(SYS_DOC_TIME, '$time').
+-define(SYS_DOC_LEVEL, '$level').
+-define(SYS_DOC_SRC, '$src').
+-define(SYS_DOC_MOD, '$mod').
+-define(SYS_DOC_CODE, '$code').
+-define(SYS_DOC_TYPE, '$type').
+-define(NOW_START_TIME, '$now_start_time').

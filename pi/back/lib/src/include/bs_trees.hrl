@@ -1,0 +1,36 @@
+-define(BS_MAX_STORAGE_SIZE, 16#100000000000).
+-define(BS_BASE_NODE_SIZE, 16#1000).
+-define(BS_MIN_T, 50).
+-define(BS_MAX_T, 100).
+-define(BS_M(T), T * 2).
+-define(ENTRY_STRUCT_SIZE, 36).
+-define(NODE_STRUCT_SIZE(Count, Size), 29 + (25 + Size) * Count + 30 * (Count + 1)).
+-define(DEFAULT_CACHE_SIZE, 256 * 1024).
+-define(DEFAULT_CACHE_TIMEOUT, 5 * 60 * 1000).
+-define(DEFAULT_ACCESS_TYPE, protected).
+-define(PUBLIC_ACCESS_TYPE, public).
+-define(VOID, '$void').
+-define(UNREF, unref).
+-define(PLACE_CHILD, {?EMPTY, 0}).
+-define(PLACE_LEFT_CHILD, {?EMPTY, l}).
+-define(PLACE_RIGHT_CHILD, {?EMPTY, r}).
+-define(EMPTY_ROOT_NODE, {?NON_LEAF_NODE, {}, {?PLACE_CHILD}}).
+-define(ROOT_MEREG_FLAG, root_merge).
+-define(MEREG_FLAG, merge).
+-define(MOVE_FLAG, move).
+-define(BS_INT_TABLE(Owner), list_to_atom(lists:concat(["bs_int@", Owner]))).
+-define(NON_LEAF_NODE, 'n').
+-define(LEAF_NODE, 'l').
+-define(NON_LEAF_ROOT_NODE, 'rn').
+-define(LEAF_ROOT_NODE, 'rl').
+-define(EMPTY, undefined).
+-define(KEY_POS, 0).
+-define(INSERT_VERSION, 2).
+-define(BS_BOF, '$bof').
+-define(BS_EOF, '$eof').
+
+-define(DEFAULT_ROOT_TIMEOUT, 4294967295).
+-define(DEFAULT_READ_TIMEOUT, 5 * 60000).
+-define(DEFAULT_WRITE_TIMEOUT, 12 * 60 * 60000).
+-define(ASYN_WAIT, wait).
+-define(INTERRUPT_STATE, interrupt).
