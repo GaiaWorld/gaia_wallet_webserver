@@ -31,9 +31,12 @@ upload({Table}, _Session, _Attr, Info, Msg) ->
 %% 	{UID, _, _} = z_lib:get_value(Attr, ?UID, ""),
 %% 	{EID, _, _} = z_lib:get_value(Attr, ?EID, ""),
 %% 	{_AuthL, _, _} = z_lib:get_value(Attr, ?SYS_AUTH, ""),
-	{_FileName, _, Content} = z_lib:get_value(Msg, ?DEFAULT_UPLOAD_FILE_KEY, []),
+	io:format("!!!!!!!!!!!upload in!!!!!!~n"),
+	{FileName, _, Content} = z_lib:get_value(Msg, ?DEFAULT_UPLOAD_FILE_KEY, []),
+	io:format("!!!!!!!!!!!upload FileName:~p~n", [FileName]),
 	%%随机生成SID
 	SID = zm_http:new_scid(z_lib:get_value(Info, ip, {0, 0, 0, 0}), z_lib:get_value(Info, port, 0), self()),
+	io:format("!!!!!!!!!!!upload SID:~p~n", [SID]),
 	%%获取数据表
 	case zm_app_db:read(Table, SID) of
 		?GEN_NIL ->
@@ -41,6 +44,7 @@ upload({Table}, _Session, _Attr, Info, Msg) ->
 		_ ->
 			erlang:throw({?ERROR_EXIST, {sid_exist, SID}})
 	end,
+	io:format("!!!!!!!!!!!upload ok !!!!!!!!!!!~n"),
 	{ok, [], Info, [{?RESULT_NAME, 1}, {"sid", SID}]}.
 
 %%微信模式文件上传
