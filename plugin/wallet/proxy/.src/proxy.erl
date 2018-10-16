@@ -47,23 +47,22 @@ get([{rite,A,B},{kline,C,D,E}], _Con, Info, Headers, Body) ->
       io:format("!!!!!!!Urlnow:~p~n",[Urlnow])
   end,
   %%调用自身方法，从服务器远端获取当前数据
-    [Q,W,P,R,T|O]=Urlnow,
-  Urlstring=[Q,W,P,R,T],
-  io:format("!!!!!!!Urlstring:~p~n",[Urlstring]),
-  if
-    Urlstring == "https" ->
+  case  Urlnow  of
+    [$h, $t, $t, $p, $s | _] ->
       io:format("!!!!!!!Urlnow:~p~n",["dsadsa"]),
       {RC,Data}=https_get(Urlnow),
       io:format("!!!!!!!Data:~p~n",[Data]),
       NewHeaders=zm_http:set_header(zm_http:resp_headers(Info, Headers, ".txt", none), "Access-Control-Allow-Origin", "*"),
       %%代理向客户端发送请求，返回当前结果,读取到的结果放回到Content中
       {ok, [{code, RC} | Info], NewHeaders, Data};
-    true ->
+    [$h, $t, $t, $p, $: | _] ->
       {RC, Data} = http_get(Urlnow),
       io:format("!!!!!!!Data:~p~n",[Data]),
       NewHeaders=zm_http:set_header(zm_http:resp_headers(Info, Headers, ".txt", none), "Access-Control-Allow-Origin", "*"),
       %%代理向客户端发送请求，返回当前结果,读取到的结果放回到Content中
-      {ok, [{code, RC} | Info], NewHeaders, Data}
+      {ok, [{code, RC} | Info], NewHeaders, Data};
+    _ ->
+      erlang:throw({500, [{errcode, 500},{errmsg, " Request protocol error"}, {result, lists:flatten(io_lib:write("error"))}, {url, Url}]})
   end.
 
 
@@ -96,7 +95,7 @@ https_get(Url) ->
         (SR =:= ok) orelse (SR =:= {error, {already_started, ssl}}) ->
           try httpc:request(get, {Url, [{"connection", "keep-alive"}]}, [{timeout, 5000}], [{body_format, binary}]) of
             {ok, {{_, RC, _}, _, Body}} when RC >= 200, RC < 400 ->
-              unicode:characters_to_list(Body, utf8);
+             {RC,Body};
             {ok, {{_, RC, Header}, _, Body}} ->
               zm_log:warn(?MODULE, https_get, https_get, "request error", [
                 {errcode, RC},
