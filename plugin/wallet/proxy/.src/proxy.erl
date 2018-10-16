@@ -36,6 +36,7 @@ get([{rite,A,B},{kline,C,D,E}], _Con, Info, Headers, Body) ->
        io:format("!#!$!$!!!!!!!!!!!A:~p~n",[A]),
        io:format("!#!$!$!!!!!!!!!!!B:~p~n",[B]),
      Urlnow=Url++"&appkey="++A++"&sign="++B,
+
     io:format("!!!!!!!Urlnow:~p~n",[Urlnow]);
     %% 取K线图
     Type == "kline" ->
@@ -46,11 +47,25 @@ get([{rite,A,B},{kline,C,D,E}], _Con, Info, Headers, Body) ->
       io:format("!!!!!!!Urlnow:~p~n",[Urlnow])
   end,
   %%调用自身方法，从服务器远端获取当前数据
-  {RC, Data} = http_get(Urlnow),
-  io:format("!!!!!!!Data:~p~n",[Data]),
-  NewHeaders=zm_http:set_header(zm_http:resp_headers(Info, Headers, ".txt", none), "Access-Control-Allow-Origin", "*"),
-  %%代理向客户端发送请求，返回当前结果,读取到的结果放回到Content中
-  {ok, [{code, RC} | Info], NewHeaders, Data}.
+    [Q,W,P,R,T|O]=Urlnow,
+  Urlstring=[Q,W,P,R,T],
+  io:format("!!!!!!!Urlstring:~p~n",[Urlstring]),
+  if
+    Urlstring == "https" ->
+      io:format("!!!!!!!Urlnow:~p~n",["dsadsa"]),
+      {RC,Data}=https_get(Urlnow),
+      io:format("!!!!!!!Data:~p~n",[Data]),
+      NewHeaders=zm_http:set_header(zm_http:resp_headers(Info, Headers, ".txt", none), "Access-Control-Allow-Origin", "*"),
+      %%代理向客户端发送请求，返回当前结果,读取到的结果放回到Content中
+      {ok, [{code, RC} | Info], NewHeaders, Data};
+    true ->
+      {RC, Data} = http_get(Urlnow),
+      io:format("!!!!!!!Data:~p~n",[Data]),
+      NewHeaders=zm_http:set_header(zm_http:resp_headers(Info, Headers, ".txt", none), "Access-Control-Allow-Origin", "*"),
+      %%代理向客户端发送请求，返回当前结果,读取到的结果放回到Content中
+      {ok, [{code, RC} | Info], NewHeaders, Data}
+  end.
+
 
 
 http_get(Url) ->
@@ -71,7 +86,35 @@ http_get(Url) ->
       erlang:throw({500, [{errcode, 500},{errmsg, "inets start error"}, {result, lists:flatten(io_lib:write(Result))}, {url, Url}]})
   end.
 
-
+https_get(Url) ->
+  % 启动网络环境
+  Result = inets:start(),
+  if
+    (Result =:= ok) orelse (Result =:= {error, {already_started, inets}}) ->
+      SR = ssl:start(),
+      if
+        (SR =:= ok) orelse (SR =:= {error, {already_started, ssl}}) ->
+          try httpc:request(get, {Url, [{"connection", "keep-alive"}]}, [{timeout, 5000}], [{body_format, binary}]) of
+            {ok, {{_, RC, _}, _, Body}} when RC >= 200, RC < 400 ->
+              unicode:characters_to_list(Body, utf8);
+            {ok, {{_, RC, Header}, _, Body}} ->
+              zm_log:warn(?MODULE, https_get, https_get, "request error", [
+                {errcode, RC},
+                {header, Header},
+                {body, Body}]),
+              erlang:throw({RC, [{errcode, RC},{errmsg, "send result error"}]});
+            E ->
+              erlang:throw({500, [{errcode, 500},{errmsg, "send result error"}]})
+          catch
+            _: Reason ->
+              erlang:throw({500, [{errcode, 500},{errmsg, "send error"}]})
+          end;
+        true ->
+          erlang:throw({500, [{errcode, 500},{errmsg, "ssl start error"}]})
+      end;
+    true ->
+      erlang:throw({500, [{errcode, 500},{errmsg, "inets start error"}]})
+  end.
 
 
 
