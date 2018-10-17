@@ -36,7 +36,10 @@ get([{rite,A,B},{kline,C,D,E}], _Con, Info, Headers, Body) ->
        io:format("!#!$!$!!!!!!!!!!!A:~p~n",[A]),
        io:format("!#!$!$!!!!!!!!!!!B:~p~n",[B]),
      Urlnow=Url++"&appkey="++A++"&sign="++B,
+<<<<<<<<< Temporary merge branch 1
+=========
 
+>>>>>>>>> Temporary merge branch 2
     io:format("!!!!!!!Urlnow:~p~n",[Urlnow]);
     %% 取K线图
     Type == "kline" ->
@@ -49,22 +52,31 @@ get([{rite,A,B},{kline,C,D,E}], _Con, Info, Headers, Body) ->
   %%调用自身方法，从服务器远端获取当前数据
   case  Urlnow  of
     [$h, $t, $t, $p, $s | _] ->
+  io:format("!!!!!!!Data:~p~n",[Data]),
+  NewHeaders=zm_http:set_header(zm_http:resp_headers(Info, Headers, ".txt", none), "Access-Control-Allow-Origin", "*"),
+  %%代理向客户端发送请求，返回当前结果,读取到的结果放回到Content中
+  {ok, [{code, RC} | Info], NewHeaders, Data}.
+=========
+    [Q,W,P,R,T|O]=Urlnow,
+  Urlstring=[Q,W,P,R,T],
+  io:format("!!!!!!!Urlstring:~p~n",[Urlstring]),
+  if
+    Urlstring == "https" ->
       io:format("!!!!!!!Urlnow:~p~n",["dsadsa"]),
       {RC,Data}=https_get(Urlnow),
       io:format("!!!!!!!Data:~p~n",[Data]),
       NewHeaders=zm_http:set_header(zm_http:resp_headers(Info, Headers, ".txt", none), "Access-Control-Allow-Origin", "*"),
       %%代理向客户端发送请求，返回当前结果,读取到的结果放回到Content中
       {ok, [{code, RC} | Info], NewHeaders, Data};
-    [$h, $t, $t, $p, $: | _] ->
+    true ->
       {RC, Data} = http_get(Urlnow),
       io:format("!!!!!!!Data:~p~n",[Data]),
       NewHeaders=zm_http:set_header(zm_http:resp_headers(Info, Headers, ".txt", none), "Access-Control-Allow-Origin", "*"),
       %%代理向客户端发送请求，返回当前结果,读取到的结果放回到Content中
-      {ok, [{code, RC} | Info], NewHeaders, Data};
-    _ ->
-      erlang:throw({500, [{errcode, 500},{errmsg, " Request protocol error"}, {result, lists:flatten(io_lib:write("error"))}, {url, Url}]})
+      {ok, [{code, RC} | Info], NewHeaders, Data}
   end.
 
+>>>>>>>>> Temporary merge branch 2
 
 
 http_get(Url) ->
@@ -85,6 +97,9 @@ http_get(Url) ->
       erlang:throw({500, [{errcode, 500},{errmsg, "inets start error"}, {result, lists:flatten(io_lib:write(Result))}, {url, Url}]})
   end.
 
+<<<<<<<<< Temporary merge branch 1
+
+=========
 https_get(Url) ->
   % 启动网络环境
   Result = inets:start(),
@@ -95,7 +110,7 @@ https_get(Url) ->
         (SR =:= ok) orelse (SR =:= {error, {already_started, ssl}}) ->
           try httpc:request(get, {Url, [{"connection", "keep-alive"}]}, [{timeout, 5000}], [{body_format, binary}]) of
             {ok, {{_, RC, _}, _, Body}} when RC >= 200, RC < 400 ->
-             {RC,Body};
+              unicode:characters_to_list(Body, utf8);
             {ok, {{_, RC, Header}, _, Body}} ->
               zm_log:warn(?MODULE, https_get, https_get, "request error", [
                 {errcode, RC},
@@ -114,6 +129,7 @@ https_get(Url) ->
     true ->
       erlang:throw({500, [{errcode, 500},{errmsg, "inets start error"}]})
   end.
+>>>>>>>>> Temporary merge branch 2
 
 
 
