@@ -48,16 +48,17 @@ show(Args, _Con, Info, Headers, Body) ->
 		Type ->
 			zm_http:set_content_type(Headers, Type, "utf-8")
 	end,
+    Headers2 = zm_http:set_header(Headers1, "Access-Control-Allow-Origin", "*"),
 	case z_lib:get_value(Body, template_file, "") of
 		"" ->
 			case z_lib:get_value(Args, template_file, "") of
 				"" ->
 					throw({?SERVER_INTERNAL_ERROR, "undefined template file"});
 				F ->
-					merge(F, Args, Info, Headers1, Body)
+					merge(F, Args, Info, Headers2, Body)
 			end;
 		F ->
-			merge(F, Args, Info, Headers1, Body)
+			merge(F, Args, Info, Headers2, Body)
 	end.
 
 %%%===================LOCAL FUNCTIONS==================

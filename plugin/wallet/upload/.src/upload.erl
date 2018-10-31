@@ -44,7 +44,7 @@ upload({Table}, _Session, _Attr, Info, Msg) ->
 		_ ->
 			erlang:throw({?ERROR_EXIST, {sid_exist, SID}})
 	end,
-	io:format("!!!!!!!!!!!upload ok !!!!!!!!!!!~n"),
+	io:format("!!!!!!!!!!!upload ok !!!!!!!!!!!SID:~p~n", [SID]),
 	{ok, [], Info, [{?RESULT_NAME, 1}, {"sid", SID}]}.
 
 %%微信模式文件上传
