@@ -10,8 +10,40 @@
 -author("user").
 
 %% API
--export([get/5,http_get/1,https_get/1]).
+-export([get/5, handle/5]).
 
+
+
+%%代理请求
+handle(_Arg, _Session, _Attr, Info, Msg) ->
+    Url = z_lib:get_value(Msg, "url", ""),
+    Key = z_lib:get_value(Msg, "key", 0), %%0表示不加密URL
+    io:format("Url=~p~n", [{?MODULE, ?LINE, Url, Key}]),
+    Url2 = case Key of
+        0 ->
+            Url;
+        Key when is_list(Key) ->
+            %%加密字符串为16进制字符串
+            z_lib:binary_xor(z_lib:hex_str_to_bin(Url), Key)
+    end,
+    io:format("Url2=~p~n", [{?MODULE, ?LINE, Url2}]),
+    Data = case Url2 of
+        [$h, $t, $t, $p, $s | _] ->
+            {_, Body} = https_get(Url2),
+            Body;
+        [$h, $t, $t, $p, $: | _] ->
+            {_, Body} = http_get(Url2),
+            Body
+    end,
+    {PKey, Value} = case Key of
+        0 ->
+            {0, Data};
+        _ ->
+            %%生成密钥
+            PK = integer_to_list(z_lib:random(100000, 999999)),
+            {PK, z_lib:binary_xor(Data, PK)}
+    end,
+    {ok, [], Info, [{"pk", PKey}, {"value", Value}]}.
 
 %%从前台接受请求，与其中的值
 get([{rite,A,B},{kline,C,D,E}], _Con, Info, Headers, Body) ->
