@@ -43,7 +43,7 @@ handle(_Arg, _Session, _Attr, Info, Msg) ->
             PK = integer_to_list(z_lib:random(100000, 999999)),
             {PK, z_lib:binary_xor(Data, PK)}
     end,
-    {ok, [], Info, [{"pk", PKey}, {"value", Value}]}.
+    {ok, [], Info, [{"pk", PKey}, {"value", z_lib:bin_to_hex_str(list_to_binary(Value), false)}]}.
 
 %%从前台接受请求，与其中的值
 get([{rite,A,B},{kline,C,D,E}], _Con, Info, Headers, Body) ->
