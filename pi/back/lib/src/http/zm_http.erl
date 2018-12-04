@@ -1113,9 +1113,38 @@ convert_rfc1123_date(
 %%%===================LOCAL FUNCTIONS==================
 % 路由消息
 route(Con, Src, Info, Headers, Body) ->
-	path_route(Con, [{host, z_lib:get_value(Headers, "host", "")} | Info],
-		Headers, parse_body(Info, Headers, Body),
-		Src, z_lib:get_value(Info, path, "/")).
+	%%解析预检查
+	case check_options(Src, Info, Headers) of
+		break ->
+			path_route(Con, [{host, z_lib:get_value(Headers, "host", "")} | Info],
+				Headers, parse_body(Info, Headers, Body),
+				Src, z_lib:get_value(Info, path, "/"));
+		Options ->
+			io:format("!!!!!!!!!Info:~p~nHeaders:~p~n", [Info, Headers]),
+			H1 = set_header(sb_trees:empty(), "Access-Control-Allow-Origin", z_lib:get_value(Headers, "origin", "*")),
+			H2 = set_header(H1, "Access-Control-Allow-Headers", "Content-Type"),
+			H3 = set_header(H2, "Access-Control-Allow-Methods", Options),
+			H4 = set_header(H3, "Access-Control-Max-Age", 3600),
+			io:format("!!!!!!!!reHeaders:~p~n", [H4]),
+			send(Con, [{code, 200} | Info], H4, [])
+	end.
+
+% 执行浏览器跨域预检查
+check_options(Src, Info, Headers) ->
+	case z_lib:get_value(Info, method, none) of
+		'OPTIONS' ->
+			case zm_config:get(?MODULE, {Src, options}) of
+				{_, Options} ->
+					% Origin = z_lib:get_value(Info, src, break),
+					% z_lib:get_value(WhiteList, Origin, break);
+					io:format("!!!!!!!!!!Options:~p~n", [Options]),
+					Options;
+				_ ->
+					break
+			end;
+		_ ->
+			break
+	end.
 
 % 路径路由消息
 path_route(Con, Info, Headers, Body, Src, Path) when Path =:= "/" ->
