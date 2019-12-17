@@ -16,6 +16,8 @@
 
 %%------错误编号----
 -define(ERROR_EXIST, -100).
+%% 文件上传限制
+-define(UPLOAD_LIMIT, 2 * 1024 * 1024).
 
 
 
@@ -33,14 +35,16 @@ upload({Table}, _Session, _Attr, Info, Msg) ->
 %% 	{_AuthL, _, _} = z_lib:get_value(Attr, ?SYS_AUTH, ""),
 	io:format("!!!!!!!!!!!upload in!!!!!!~n"),
 	{FileName, _, Content} = z_lib:get_value(Msg, ?DEFAULT_UPLOAD_FILE_KEY, []),
-	io:format("!!!!!!!!!!!upload FileName:~p~n", [FileName]),
+	Size = size(Content),
+	io:format("!!!!!!!!!!!upload FileName:~p, size:~p~n", [FileName, Size]),
+	[erlang:throw({?ERROR_EXIST, {size_limit, Size, ?UPLOAD_LIMIT}}) || Size > ?UPLOAD_LIMIT],
 	%%随机生成SID
 	SID = zm_http:new_scid(z_lib:get_value(Info, ip, {0, 0, 0, 0}), z_lib:get_value(Info, port, 0), self()),
 	io:format("!!!!!!!!!!!upload SID:~p~n", [SID]),
 	%%获取数据表
 	case zm_app_db:read(Table, SID) of
 		?GEN_NIL ->
-			ok = zm_app_db:write(Table, SID, {size(Content), Content, z_lib:now_millisecond()}, ?MODULE);
+			ok = zm_app_db:write(Table, SID, {Size, Content, z_lib:now_millisecond()}, ?MODULE);
 		_ ->
 			erlang:throw({?ERROR_EXIST, {sid_exist, SID}})
 	end,
