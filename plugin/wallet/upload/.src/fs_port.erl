@@ -23,7 +23,13 @@ upload(Args, _Session, _Attr, Info, Msg) ->
 			 "" ->
 				Root;
 			 P ->
-				 filename:join([Root, P])
+				%%判断path是否安全
+				case filename:safe_relative_path(P) of
+					unsafe ->
+						Root;
+					_ ->
+						filename:join([Root, P])
+			end
 	end,
 	% io:format("Msg:~p~n", [Msg]),
 	case z_lib:get_value(Msg, ?DEFAULT_UPLOAD_FILE_KEY, none) of
